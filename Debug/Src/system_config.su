@@ -1,0 +1,7 @@
+../CMSIS/core_cm0.h:623:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+../CMSIS/core_cm0.h:732:22:__NVIC_SetPriority	24	static
+../Src/system_config.c:12:6:SystemClock_Config	8	static
+../Src/system_config.c:32:6:GPIO_Init	8	static
+../Src/system_config.c:46:6:EXTI_Init	8	static
+../Src/system_config.c:61:6:Delay	16	static,ignoring_inline_asm
+../Src/system_config.c:68:5:is_button_pressed	8	static

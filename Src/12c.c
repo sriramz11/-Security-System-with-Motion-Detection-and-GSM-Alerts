@@ -1,0 +1,95 @@
+/*
+ * 12c.c
+ *
+ *  Created on: Dec 11, 2024
+ *      Author: srira
+ */
+
+
+#include "i2c.h"
+#include "stm32f091xc.h"
+#include "stm32f0xx.h"
+
+/* INITIALIZES THE I2C INTERFACE */
+void I2C_Init(void){
+    /* ENABLE GPIOB AND I2C1 CLOCKS (NATIVE) */
+    RCC->AHBENR |= RCC_AHBENR_GPIOBEN;
+    RCC->APB1ENR |= RCC_APB1ENR_I2C1EN;
+    		/* CONFIGURE GPIOB PINS FOR I2C (PB8: SCL, PB9: SDA) */
+    GPIOB->MODER &= ~((3U << (GPIOB_PIN_8 * 2)) | (3U << (GPIOB_PIN_9 * 2))); /* CLEAR MODE */
+    GPIOB->MODER |= (GPIO_MODE_AF << (GPIOB_PIN_8 * 2)) | (GPIO_MODE_AF << (GPIOB_PIN_9 * 2)); /* SET OPEN DRAIN */
+    GPIOB->OTYPER |= (GPIO_OTYPE_OPEN_DRAIN << GPIOB_PIN_8) | (GPIO_OTYPE_OPEN_DRAIN << GPIOB_PIN_9); /* SET FAST SPEED */
+    GPIOB->OSPEEDR |= (GPIO_OSPEED_FAST << (GPIOB_PIN_8 * 2)) | (GPIO_OSPEED_FAST << (GPIOB_PIN_9 * 2)); // Fast Speed
+    GPIOB->AFR[1] |= (GPIO_AF1 << ((GPIOB_PIN_8 - 8) * 4)) | (GPIO_AF1 << ((GPIOB_PIN_9 - 8) * 4));/* SET ALTERNATE FUNCTION */
+
+    	/* RESET I2C1 PERIPHERAL */
+    RCC->APB1RSTR |= RCC_APB1RSTR_I2C1RST;
+    RCC->APB1RSTR &= ~RCC_APB1RSTR_I2C1RST;
+
+    /* CONFIGURE I2C TIMING AND ENABLE I2C */
+    I2C1->TIMINGR = I2C_TIMING_100KHZ;
+    I2C1->CR1 |= I2C_CR1_PE;
+}
+
+
+
+
+/* WRITES DATA TO A SPECIFIED REGISTER ON THE I2C DEVICE */
+void I2C_Write(uint8_t addr, uint8_t reg, uint8_t data) {
+    /* WAIT UNTIL I2C IS NOT BUSY */
+    while (I2C1->ISR & I2C_ISR_BUSY);
+
+    /* CONFIGURE I2C TO WRITE 2 BYTES (REGISTER + DATA) */
+    I2C1->CR2 = (addr << 1) | (2 << I2C_CR2_NBYTES_Pos);
+    I2C1->CR2 |= I2C_CR2_START; /* GENERATE START CONDITION */
+
+    /* WAIT FOR TRANSMIT REGISTER TO BE EMPTY AND SEND REGISTER ADDRESS */
+    while (!(I2C1->ISR & I2C_ISR_TXIS));
+    I2C1->TXDR = reg;
+
+    /* WAIT FOR TRANSMIT REGISTER TO BE EMPTY AND SEND DATA */
+    while (!(I2C1->ISR & I2C_ISR_TXIS));
+    I2C1->TXDR = data;
+
+    /* WAIT UNTIL TRANSFER IS COMPLETE */
+    while (!(I2C1->ISR & I2C_ISR_TC));
+    I2C1->CR2 |= I2C_CR2_STOP; /* GENERATE STOP CONDITION */
+
+    /* WAIT UNTIL STOP CONDITION IS DETECTED */
+    while (!(I2C1->ISR & I2C_ISR_STOPF));
+    I2C1->ICR |= I2C_ICR_STOPCF; /* CLEAR STOP FLAG */
+}
+
+
+
+
+	/* READS MULTIPLE BYTES FROM THE I2C DEVICE STARTING AT A SPECIFIED REGISTER */
+void I2C_ReadMultiple(uint8_t addr, uint8_t reg, uint8_t *buffer, uint8_t size) {
+	    /* WAIT UNTIL I2C IS NOT BUSY */
+	    while (I2C1->ISR & I2C_ISR_BUSY);
+
+	    /* CONFIGURE I2C TO WRITE 1 BYTE (REGISTER ADDRESS) */
+	    I2C1->CR2 = (addr << 1) | (1 << I2C_CR2_NBYTES_Pos);
+	    I2C1->CR2 |= I2C_CR2_START; /* GENERATE START CONDITION */
+
+	    /* WAIT FOR TRANSMIT REGISTER TO BE EMPTY AND SEND REGISTER ADDRESS */
+	    while (!(I2C1->ISR & I2C_ISR_TXIS));
+	    I2C1->TXDR = reg;
+
+	    /* WAIT UNTIL TRANSFER IS COMPLETE */
+	    while (!(I2C1->ISR & I2C_ISR_TC));
+
+	    /* CONFIGURE I2C TO READ MULTIPLE BYTES */
+	    I2C1->CR2 = (addr << 1) | I2C_CR2_RD_WRN | (size << I2C_CR2_NBYTES_Pos);
+	    I2C1->CR2 |= I2C_CR2_START | I2C_CR2_AUTOEND; /* GENERATE START AND AUTO STOP */
+
+	    /* READ DATA INTO BUFFER */
+	    for (uint8_t i = 0; i < size; i++) {
+	        while (!(I2C1->ISR & I2C_ISR_RXNE)); /* WAIT UNTIL RECEIVE REGISTER IS NOT EMPTY */
+	        buffer[i] = I2C1->RXDR;
+	    }
+
+	    /* WAIT UNTIL STOP CONDITION IS DETECTED */
+	    while (!(I2C1->ISR & I2C_ISR_STOPF));
+	    I2C1->ICR |= I2C_ICR_STOPCF; /* CLEAR STOP FLAG */
+	}

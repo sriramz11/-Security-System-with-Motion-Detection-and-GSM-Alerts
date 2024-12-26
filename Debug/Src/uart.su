@@ -1,0 +1,9 @@
+../CMSIS/core_cm0.h:623:22:__NVIC_EnableIRQ	16	static,ignoring_inline_asm
+../CMSIS/core_cm0.h:732:22:__NVIC_SetPriority	24	static
+../Src/uart.c:23:6:UART_Initialize	8	static
+../Src/uart.c:46:6:UART_PrintString	16	static
+../Src/uart.c:54:6:UART_PrintHex	56	static
+../Src/uart.c:63:6:UART_HandleBackspace	8	static
+../Src/uart.c:71:6:UART_ShowMenu	8	static
+../Src/uart.c:80:6:UART_AlertMovement	8	static
+../Src/uart.c:89:6:USART2_IRQHandler	16	static

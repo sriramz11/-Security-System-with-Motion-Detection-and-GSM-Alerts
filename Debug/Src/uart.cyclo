@@ -1,0 +1,9 @@
+../CMSIS/core_cm0.h:623:22:__NVIC_EnableIRQ	2
+../CMSIS/core_cm0.h:732:22:__NVIC_SetPriority	2
+../Src/uart.c:23:6:UART_Initialize	1
+../Src/uart.c:46:6:UART_PrintString	3
+../Src/uart.c:54:6:UART_PrintHex	1
+../Src/uart.c:63:6:UART_HandleBackspace	1
+../Src/uart.c:71:6:UART_ShowMenu	1
+../Src/uart.c:80:6:UART_AlertMovement	2
+../Src/uart.c:89:6:USART2_IRQHandler	4

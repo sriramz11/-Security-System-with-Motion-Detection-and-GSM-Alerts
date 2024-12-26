@@ -1,0 +1,6 @@
+../Src/mpu6050.c:21:9:set_together_int16	1
+../Src/mpu6050.c:26:6:GetRawData	1
+../Src/mpu6050.c:42:6:calibrateMPU6050	8
+../Src/mpu6050.c:92:6:detectMotion	10
+../Src/mpu6050.c:126:6:mpu6050_init	2
+../Src/mpu6050.c:146:6:EXTI4_15_IRQHandler	4

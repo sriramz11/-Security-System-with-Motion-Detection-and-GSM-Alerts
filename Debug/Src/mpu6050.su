@@ -1,0 +1,6 @@
+../Src/mpu6050.c:21:9:set_together_int16	16	static
+../Src/mpu6050.c:26:6:GetRawData	112	static
+../Src/mpu6050.c:42:6:calibrateMPU6050	192	static
+../Src/mpu6050.c:92:6:detectMotion	112	static
+../Src/mpu6050.c:126:6:mpu6050_init	16	static
+../Src/mpu6050.c:146:6:EXTI4_15_IRQHandler	16	static
